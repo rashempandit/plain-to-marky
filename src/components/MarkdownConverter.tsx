@@ -18,6 +18,14 @@ const MarkdownConverter = () => {
 
     const lines = text.split('\n');
     const convertedLines = lines.map((line, index) => {
+      // First line (title) - make it bold if it's not already a numbered heading
+      if (index === 0 && line.trim()) {
+        const isNumberedHeading = line.match(/^(\d+)\.\s+(.+)$/);
+        if (!isNumberedHeading) {
+          return `**${line}**`;
+        }
+      }
+      
       // Match patterns like "1. Scope" or "2. Introduction" (main headings)
       const mainHeadingMatch = line.match(/^(\d+)\.\s+(.+)$/);
       if (mainHeadingMatch) {
@@ -132,10 +140,21 @@ const MarkdownConverter = () => {
           {/* Output Panel */}
           <Card className="shadow-soft border-border/50">
             <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <Code className="h-5 w-5 text-primary" />
-                Markdown Output
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Code className="h-5 w-5 text-primary" />
+                  Markdown Output
+                </CardTitle>
+                <Button
+                  onClick={copyToClipboard}
+                  disabled={!outputText}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copy
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="min-h-[400px] p-4 bg-muted/30 rounded-md border border-border/30 font-mono text-sm whitespace-pre-wrap overflow-auto">
