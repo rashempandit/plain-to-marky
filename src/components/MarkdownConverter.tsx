@@ -18,16 +18,49 @@ const MarkdownConverter = () => {
 
     const lines = text.split('\n');
     const convertedLines = lines.map((line, index) => {
+      let processedLine = line;
+
+      // Convert URLs and email addresses to markdown format
+      // Match email addresses
+      processedLine = processedLine.replace(
+        /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+        (match) => `[${match}](mailto:${match})`
+      );
+
+      // Match URLs starting with http:// or https://
+      processedLine = processedLine.replace(
+        /https?:\/\/[^\s]+/g,
+        (match) => `[${match}](${match})`
+      );
+
+      // Match URLs starting with www.
+      processedLine = processedLine.replace(
+        /\bwww\.[^\s]+/g,
+        (match) => `[${match}](http://${match})`
+      );
+
+      // Match domain-like patterns (example.com, example.co.uk, etc.)
+      processedLine = processedLine.replace(
+        /\b[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?\b(?!@)/g,
+        (match) => {
+          // Skip if it's already part of an email or URL
+          if (processedLine.includes(`[${match}]`) || processedLine.includes(`@${match}`)) {
+            return match;
+          }
+          return `[${match}](http://${match})`;
+        }
+      );
+
       // First line (title) - make it bold if it's not already a numbered heading
-      if (index === 0 && line.trim()) {
-        const isNumberedHeading = line.match(/^(\d+)\.\s+(.+)$/);
+      if (index === 0 && processedLine.trim()) {
+        const isNumberedHeading = processedLine.match(/^(\d+)\.\s+(.+)$/);
         if (!isNumberedHeading) {
-          return `**${line}**`;
+          return `**${processedLine}**`;
         }
       }
       
       // Match patterns like "1. Scope" or "2. Introduction" (main headings)
-      const mainHeadingMatch = line.match(/^(\d+)\.\s+(.+)$/);
+      const mainHeadingMatch = processedLine.match(/^(\d+)\.\s+(.+)$/);
       if (mainHeadingMatch) {
         // Check if previous line was a sub-numbering or non-numbered text
         if (index > 0) {
@@ -43,15 +76,15 @@ const MarkdownConverter = () => {
       }
       
       // Check if this line is a sub-numbering (like "1.1", "2.1") or non-numbered text
-      const isSubNumbering = line.match(/^\d+\.\d+/);
-      const isNonNumbered = line.trim() && !line.match(/^\d+\./) && !line.match(/^\d+\.\d+/);
+      const isSubNumbering = processedLine.match(/^\d+\.\d+/);
+      const isNonNumbered = processedLine.trim() && !processedLine.match(/^\d+\./) && !processedLine.match(/^\d+\.\d+/);
       
       // Add line break before sub-numberings and non-numbered text (except for the first line)
       if (index > 0 && (isSubNumbering || isNonNumbered)) {
-        return `\n${line}`;
+        return `\n${processedLine}`;
       }
       
-      return line;
+      return processedLine;
     });
     
     setOutputText(convertedLines.join('\n'));
