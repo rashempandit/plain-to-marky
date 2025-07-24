@@ -11,10 +11,11 @@ const MarkdownConverter = () => {
     toast
   } = useToast();
   const convertToMarkdown = (text: string) => {
-    if (!text.trim()) {
-      setOutputText("");
-      return;
-    }
+    try {
+      if (!text.trim()) {
+        setOutputText("");
+        return;
+      }
     const lines = text.split('\n');
     const convertedLines = lines.map((line, index) => {
       let processedLine = line;
@@ -71,7 +72,15 @@ const MarkdownConverter = () => {
       }
       return processedLine;
     });
-    setOutputText(convertedLines.join('\n'));
+      setOutputText(convertedLines.join('\n'));
+    } catch (err) {
+      console.error("Markdown conversion failed:", err);
+      toast({
+        title: "Error",
+        description: "Failed to convert text to markdown",
+        variant: "destructive"
+      });
+    }
   };
   const handleInputChange = (value: string) => {
     setInputText(value);
@@ -79,15 +88,19 @@ const MarkdownConverter = () => {
   };
   const copyToClipboard = async () => {
     try {
+      if (!navigator.clipboard) {
+        throw new Error("Clipboard API not available");
+      }
       await navigator.clipboard.writeText(outputText);
       toast({
         title: "Copied!",
         description: "Markdown text copied to clipboard"
       });
     } catch (err) {
+      console.error("Copy to clipboard failed:", err);
       toast({
-        title: "Error",
-        description: "Failed to copy to clipboard",
+        title: "Error", 
+        description: err instanceof Error ? err.message : "Failed to copy to clipboard",
         variant: "destructive"
       });
     }
