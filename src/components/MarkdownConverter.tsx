@@ -21,6 +21,16 @@ const MarkdownConverter = () => {
       // Match patterns like "1. Scope" or "2. Introduction" (main headings)
       const mainHeadingMatch = line.match(/^(\d+)\.\s+(.+)$/);
       if (mainHeadingMatch) {
+        // Check if previous line was a sub-numbering or non-numbered text
+        if (index > 0) {
+          const prevLine = lines[index - 1];
+          const prevIsSubNumbering = prevLine.match(/^\d+\.\d+/);
+          const prevIsNonNumbered = prevLine.trim() && !prevLine.match(/^\d+\./) && !prevLine.match(/^\d+\.\d+/);
+          
+          if (prevIsSubNumbering || prevIsNonNumbered) {
+            return `\n**${mainHeadingMatch[1]}. ${mainHeadingMatch[2]}**`;
+          }
+        }
         return `**${mainHeadingMatch[1]}. ${mainHeadingMatch[2]}**`;
       }
       
