@@ -17,14 +17,22 @@ const MarkdownConverter = () => {
     }
 
     const lines = text.split('\n');
-    const convertedLines = lines.map(line => {
+    const convertedLines = lines.map((line, index) => {
       // Match patterns like "1. Scope" or "2. Introduction" (main headings)
       const mainHeadingMatch = line.match(/^(\d+)\.\s+(.+)$/);
       if (mainHeadingMatch) {
         return `**${mainHeadingMatch[1]}. ${mainHeadingMatch[2]}**`;
       }
       
-      // Keep sub-numbering like "1.1" or "2.2" as is
+      // Check if this line is a sub-numbering (like "1.1", "2.1") or non-numbered text
+      const isSubNumbering = line.match(/^\d+\.\d+/);
+      const isNonNumbered = line.trim() && !line.match(/^\d+\./) && !line.match(/^\d+\.\d+/);
+      
+      // Add line break before sub-numberings and non-numbered text (except for the first line)
+      if (index > 0 && (isSubNumbering || isNonNumbered)) {
+        return `\n${line}`;
+      }
+      
       return line;
     });
     
