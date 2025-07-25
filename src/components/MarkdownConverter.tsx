@@ -115,6 +115,15 @@ const MarkdownConverter = () => {
   };
   return <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto px-4 py-8">
+        {/* Logo */}
+        <div className="mb-6">
+          <img 
+            src="/lovable-uploads/80439128-9f10-4515-999c-c4b0fe066f47.png" 
+            alt="PTM Logo" 
+            className="h-12 w-auto"
+          />
+        </div>
+        
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
