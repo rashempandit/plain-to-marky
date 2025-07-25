@@ -118,7 +118,7 @@ const MarkdownConverter = () => {
         {/* Logo */}
         <div className="mb-6">
           <img 
-            src="/lovable-uploads/80439128-9f10-4515-999c-c4b0fe066f47.png" 
+            src="https://lovable-uploads.s3.amazonaws.com/80439128-9f10-4515-999c-c4b0fe066f47.png" 
             alt="PTM Logo" 
             className="h-12 w-auto"
           />
