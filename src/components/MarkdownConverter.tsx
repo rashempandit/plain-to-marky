@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Copy, Trash2, FileText, Code } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import logo from "@/assets/logo.png";
 const MarkdownConverter = () => {
   const [inputText, setInputText] = useState("");
   const [outputText, setOutputText] = useState("");
@@ -117,10 +118,12 @@ const MarkdownConverter = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-primary rounded-xl shadow-elegant">
-              <Code className="h-6 w-6 text-primary-foreground" />
-            </div>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <img 
+              src={logo} 
+              alt="Markdown Converter Logo" 
+              className="h-16 w-16 drop-shadow-lg"
+            />
             <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
               Markdown Converter
             </h1>
