@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Copy, Trash2, FileText, Code } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import ptmLogo from "@/assets/ptm-logo.png";
 const MarkdownConverter = () => {
   const [inputText, setInputText] = useState("");
   const [outputText, setOutputText] = useState("");
@@ -118,7 +119,7 @@ const MarkdownConverter = () => {
         {/* Logo */}
         <div className="mb-6">
           <img 
-            src="https://lovable-uploads.s3.amazonaws.com/80439128-9f10-4515-999c-c4b0fe066f47.png" 
+            src={ptmLogo} 
             alt="PTM Logo" 
             className="h-12 w-auto"
           />
