@@ -4,13 +4,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Copy, Trash2, FileText, Code } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import ptmLogo from "@/assets/ptm-logo.png";
+import { useLogoProcessing } from "@/hooks/useLogoProcessing";
 const MarkdownConverter = () => {
   const [inputText, setInputText] = useState("");
   const [outputText, setOutputText] = useState("");
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const { processedLogoUrl, isProcessing } = useLogoProcessing();
   const convertToMarkdown = (text: string) => {
     try {
       if (!text.trim()) {
@@ -118,11 +117,21 @@ const MarkdownConverter = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Logo */}
         <div className="mb-6">
-          <img 
-            src={ptmLogo} 
-            alt="PTM Logo" 
-            className="h-12 w-auto"
-          />
+          {isProcessing ? (
+            <div className="h-12 w-24 bg-muted animate-pulse rounded" />
+          ) : processedLogoUrl ? (
+            <img 
+              src={processedLogoUrl} 
+              alt="PTM Logo" 
+              className="h-12 w-auto"
+            />
+          ) : (
+            <img 
+              src="https://lovable-uploads.s3.amazonaws.com/92c68078-1244-4e00-8c95-5b4d93742c71.png" 
+              alt="PTM Logo" 
+              className="h-12 w-auto"
+            />
+          )}
         </div>
         
         {/* Header */}
