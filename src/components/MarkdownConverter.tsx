@@ -24,31 +24,25 @@ const MarkdownConverter = () => {
       // Match email addresses first (to avoid conflicts)
       processedLine = processedLine.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, match => `[${match}](mailto:${match})`);
 
-      // Match full URLs starting with http:// or https:// (complete URLs including paths)
-      processedLine = processedLine.replace(/https?:\/\/[^\s\]]+/g, match => {
-        // Remove trailing punctuation that shouldn't be part of the URL
-        const cleanMatch = match.replace(/[.,;:!?]$/, '');
-        const trailingPunc = match.length > cleanMatch.length ? match.slice(-1) : '';
+      // Match complete URLs with full paths (http/https and www patterns)
+      // First handle full URLs with protocols
+      processedLine = processedLine.replace(/https?:\/\/[^\s\)\]]+/g, match => {
+        // Clean trailing punctuation
+        const cleanMatch = match.replace(/[.,;:!?]+$/, '');
+        const trailingPunc = match.substring(cleanMatch.length);
         return `[${cleanMatch}](${cleanMatch})${trailingPunc}`;
       });
-
-      // Match URLs starting with www. (only if not already processed)
-      processedLine = processedLine.replace(/(?<!\()\bwww\.[^\s\]]+/g, match => {
-        // Remove trailing punctuation that shouldn't be part of the URL
-        const cleanMatch = match.replace(/[.,;:!?]$/, '');
-        const trailingPunc = match.length > cleanMatch.length ? match.slice(-1) : '';
-        return `[${cleanMatch}](http://${cleanMatch})${trailingPunc}`;
-      });
-
-      // Match domain-like patterns (example.com) only if not already processed
-      processedLine = processedLine.replace(/(?<!\[)(?<!http:\/\/)(?<!https:\/\/)\b[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?\b(?!@)(?!\])/g, match => {
-        // Skip if it's already part of markdown link or email
-        if (processedLine.includes(`[${match}]`) || processedLine.includes(`@${match}`) || processedLine.includes(`(${match})`)) {
+      
+      // Then handle www URLs (avoid double processing by checking for existing markdown)
+      processedLine = processedLine.replace(/(?<!\[)(?<!\()www\.[^\s\)\]]+/g, match => {
+        // Skip if already inside markdown link
+        const beforeMatch = processedLine.substring(0, processedLine.indexOf(match));
+        if (beforeMatch.includes('[') && !beforeMatch.includes(']')) {
           return match;
         }
-        // Remove trailing punctuation
-        const cleanMatch = match.replace(/[.,;:!?]$/, '');
-        const trailingPunc = match.length > cleanMatch.length ? match.slice(-1) : '';
+        
+        const cleanMatch = match.replace(/[.,;:!?]+$/, '');
+        const trailingPunc = match.substring(cleanMatch.length);
         return `[${cleanMatch}](http://${cleanMatch})${trailingPunc}`;
       });
 
