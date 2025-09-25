@@ -21,22 +21,35 @@ const MarkdownConverter = () => {
       let processedLine = line;
 
       // Convert URLs and email addresses to markdown format
-      // Match email addresses
+      // Match email addresses first (to avoid conflicts)
       processedLine = processedLine.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, match => `[${match}](mailto:${match})`);
 
-      // Match URLs starting with http:// or https://
-      processedLine = processedLine.replace(/https?:\/\/[^\s]+/g, match => `[${match}](${match})`);
+      // Match full URLs starting with http:// or https:// (complete URLs including paths)
+      processedLine = processedLine.replace(/https?:\/\/[^\s\]]+/g, match => {
+        // Remove trailing punctuation that shouldn't be part of the URL
+        const cleanMatch = match.replace(/[.,;:!?]$/, '');
+        const trailingPunc = match.length > cleanMatch.length ? match.slice(-1) : '';
+        return `[${cleanMatch}](${cleanMatch})${trailingPunc}`;
+      });
 
-      // Match URLs starting with www.
-      processedLine = processedLine.replace(/\bwww\.[^\s]+/g, match => `[${match}](http://${match})`);
+      // Match URLs starting with www. (only if not already processed)
+      processedLine = processedLine.replace(/(?<!\()\bwww\.[^\s\]]+/g, match => {
+        // Remove trailing punctuation that shouldn't be part of the URL
+        const cleanMatch = match.replace(/[.,;:!?]$/, '');
+        const trailingPunc = match.length > cleanMatch.length ? match.slice(-1) : '';
+        return `[${cleanMatch}](http://${cleanMatch})${trailingPunc}`;
+      });
 
-      // Match domain-like patterns (example.com, example.co.uk, etc.)
-      processedLine = processedLine.replace(/\b[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?\b(?!@)/g, match => {
-        // Skip if it's already part of an email or URL
-        if (processedLine.includes(`[${match}]`) || processedLine.includes(`@${match}`)) {
+      // Match domain-like patterns (example.com) only if not already processed
+      processedLine = processedLine.replace(/(?<!\[)(?<!http:\/\/)(?<!https:\/\/)\b[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?\b(?!@)(?!\])/g, match => {
+        // Skip if it's already part of markdown link or email
+        if (processedLine.includes(`[${match}]`) || processedLine.includes(`@${match}`) || processedLine.includes(`(${match})`)) {
           return match;
         }
-        return `[${match}](http://${match})`;
+        // Remove trailing punctuation
+        const cleanMatch = match.replace(/[.,;:!?]$/, '');
+        const trailingPunc = match.length > cleanMatch.length ? match.slice(-1) : '';
+        return `[${cleanMatch}](http://${cleanMatch})${trailingPunc}`;
       });
 
       // First line (title) - make it bold if it's not already a numbered heading
